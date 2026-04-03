@@ -1,5 +1,5 @@
 const SERVER_ROOT = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const BASE_URL = `${SERVER_ROOT}/api`;
+export const BASE_URL = `${SERVER_ROOT}/api`;
 
 export const api = {
   get: async (path: string, token?: string) => {
