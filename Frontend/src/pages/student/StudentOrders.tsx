@@ -8,6 +8,7 @@ import { useMyOrders } from "@/hooks/useOrders";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { BASE_URL } from "@/lib/api";
 
 const navItems = [
   { label: "Browse", path: "/student-dashboard", icon: <Home className="w-4 h-4" /> },
@@ -36,14 +37,16 @@ const StudentOrders = () => {
     
     setDownloadingId(orderId);
     try {
-      const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const response = await fetch(`${BASE_URL}/orders/${orderId}/invoice`, {
         headers: {
           Authorization: `Bearer ${currentUser.token}`,
         },
       });
 
-      if (!response.ok) throw new Error("Failed to generate invoice");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to generate invoice");
+      }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -56,22 +59,17 @@ const StudentOrders = () => {
       document.body.removeChild(a);
       
       toast({ title: "Invoice downloaded", description: "PDF has been saved to your device." });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Invoice Download Error:", error);
       toast({ 
         title: "Download failed", 
-        description: "Could not generate your invoice. Please try again later.",
+        description: error.message || "Could not generate your invoice. Please try again later.",
         variant: "destructive" 
       });
     } finally {
       setDownloadingId(null);
     }
   };
-
-  console.log("Student Orders Page Debug:", {
-    tokenPresent: !!currentUser?.token,
-    orderCount: orders.length,
-    isLoading
-  });
 
   if (isLoading) {
     return (
@@ -126,7 +124,7 @@ const StudentOrders = () => {
                       <ShoppingBag className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <p className="font-black text-base group-hover:text-primary transition-colors uppercase tracking-tight">Order #{order._id.slice(-6)}</p>
+                      <p className="font-black text-base group-hover:text-primary transition-colors uppercase tracking-tight">Order #{order._id.slice(-6).toUpperCase()}</p>
                       <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{new Date(order.createdAt).toLocaleString(undefined, {
                         dateStyle: 'medium',
                         timeStyle: 'short'
@@ -165,31 +163,32 @@ const StudentOrders = () => {
                     </div>
                     <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
                        <span className="text-2xl font-black text-primary tracking-tighter leading-none">₹{order.totalAmount}</span>
-                       {order.paymentMethod === "cod" && order.paymentStatus === "pending" ? (
-                         <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-0 shadow-none font-black text-[8px] px-2 py-0.5 rounded-lg tracking-widest">PAY ON DELIVERY</Badge>
-                       ) : (
-                         <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 shadow-none font-black text-[8px] px-2 py-0.5 rounded-lg tracking-widest">PAID</Badge>
-                       )}
-                       <span className="text-[10px] font-bold text-muted-foreground opacity-50">₹{order.itemsTotal} + Fees</span>
+                       <div className="flex items-center gap-2">
+                         {order.paymentMethod === "cod" && order.paymentStatus === "pending" ? (
+                           <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-0 shadow-none font-black text-[8px] px-2 py-0.5 rounded-lg tracking-widest">PAY ON DELIVERY</Badge>
+                         ) : (
+                           <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 shadow-none font-black text-[8px] px-2 py-0.5 rounded-lg tracking-widest">PAID</Badge>
+                         )}
+                         <span className="text-[10px] font-bold text-muted-foreground opacity-50">₹{order.itemsTotal} + Fees</span>
+                       </div>
                     </div>
                   </div>
 
-                  {/* Actions Area */}
                   {order.status === "delivered" && (
-                    <div className="pt-5 mt-4 border-t border-border/30 flex justify-end">
+                    <div className="pt-2">
                       <Button 
-                        variant="ghost" 
+                        variant="secondary" 
                         size="sm" 
                         onClick={() => handleDownloadInvoice(order._id)}
                         disabled={downloadingId === order._id}
-                        className="font-black text-[10px] uppercase tracking-widest text-primary hover:bg-primary/5 hover:text-primary rounded-xl h-10 px-6 gap-2"
+                        className="w-full font-black text-[10px] uppercase tracking-widest rounded-xl h-12 gap-2 shadow-sm"
                       >
                         {downloadingId === order._id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin text-primary" />
                         ) : (
-                          <FileDown className="w-4 h-4" />
+                          <FileDown className="w-4 h-4 text-primary" />
                         )}
-                        {downloadingId === order._id ? "Generating..." : "Download Invoice"}
+                        {downloadingId === order._id ? "Generating Invoice..." : "Download Invoice"}
                       </Button>
                     </div>
                   )}

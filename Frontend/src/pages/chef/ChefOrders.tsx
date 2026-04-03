@@ -22,6 +22,7 @@ import {
   User
 } from "lucide-react";
 import { useChefOrders, useUpdateOrderStatus, ApiOrder } from "@/hooks/useOrders";
+import { BASE_URL } from "@/lib/api";
 
 const navItems = [
   { label: "Dashboard", path: "/chef-dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
@@ -59,14 +60,16 @@ const ChefOrders = () => {
     
     setDownloadingId(orderId);
     try {
-      const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const response = await fetch(`${BASE_URL}/orders/${orderId}/invoice`, {
         headers: {
           Authorization: `Bearer ${currentUser.token}`,
         },
       });
 
-      if (!response.ok) throw new Error("Failed to generate invoice");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to generate invoice");
+      }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -79,8 +82,13 @@ const ChefOrders = () => {
       document.body.removeChild(a);
       
       toast({ title: "Invoice downloaded" });
-    } catch (error) {
-      toast({ title: "Download failed", variant: "destructive" });
+    } catch (error: any) {
+      console.error("Chef Invoice Download Error:", error);
+      toast({ 
+        title: "Download failed", 
+        description: error.message || "Could not generate invoice. Please try again.",
+        variant: "destructive" 
+      });
     } finally {
       setDownloadingId(null);
     }
@@ -113,7 +121,7 @@ const ChefOrders = () => {
 
   return (
     <DashboardLayout navItems={navItems} title="Order Management">
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-10">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight">Active Orders</h2>
           <Badge variant="outline" className="px-3 py-1 font-semibold rounded-full border-primary/20 text-primary">
@@ -234,7 +242,7 @@ const ChefOrders = () => {
                             ) : (
                               <FileDown className="w-4 h-4" />
                             )}
-                            {downloadingId === order._id ? "Generating..." : "Download Batch Invoice"}
+                            {downloadingId === order._id ? "Generating..." : "Download Invoice"}
                           </Button>
                         )}
                       </div>
