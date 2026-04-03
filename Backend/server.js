@@ -15,7 +15,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import userRoutes from "./routes/user.js";
 
 // Load env vars
-dotenv.config();
+dotenv.config(); 
 
 // Connect to Database
 connectDB();
