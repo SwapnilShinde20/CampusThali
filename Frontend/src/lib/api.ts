@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_URL + "/api" || "http://localhost:5000/api";
+const SERVER_ROOT = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const BASE_URL = `${SERVER_ROOT}/api`;
 
 export const api = {
   get: async (path: string, token?: string) => {
@@ -69,6 +70,5 @@ export const getImageUrl = (imagePath: string) => {
   if (!imagePath) return "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400";
   if (imagePath.startsWith("http")) return imagePath;
 
-  const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
-  return `${SERVER_URL}/${imagePath}`;
+  return `${SERVER_ROOT}/${imagePath}`;
 };
