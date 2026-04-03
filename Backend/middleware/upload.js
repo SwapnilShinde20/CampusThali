@@ -1,10 +1,26 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
+
+// Ensure uploads directory exists
+const uploadDir = 'uploads/';
+const reviewsDir = 'uploads/reviews/';
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+if (!fs.existsSync(reviewsDir)) {
+  fs.mkdirSync(reviewsDir, { recursive: true });
+}
 
 // Set storage engine
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    if (file.fieldname === 'image' && req.originalUrl.includes('reviews')) {
+      cb(null, reviewsDir);
+    } else {
+      cb(null, uploadDir);
+    }
   },
   filename: (req, file, cb) => {
     // Generate unique filename: timestamp + original extension

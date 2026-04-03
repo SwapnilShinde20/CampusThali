@@ -3,12 +3,13 @@ import { useApp } from "@/contexts/AppContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Home, ShoppingBag, Clock, Package, Loader2, AlertCircle, FileDown, MapPin, User } from "lucide-react";
+import { Home, ShoppingBag, Clock, Package, Loader2, AlertCircle, FileDown, MapPin, User, Star } from "lucide-react";
 import { useMyOrders } from "@/hooks/useOrders";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { BASE_URL } from "@/lib/api";
+import ReviewModal from "@/components/ReviewModal";
 
 const navItems = [
   { label: "Browse", path: "/student-dashboard", icon: <Home className="w-4 h-4" /> },
@@ -29,8 +30,12 @@ const StudentOrders = () => {
   const { currentUser } = useApp();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: orders = [], isLoading, isError } = useMyOrders(currentUser?.token || "");
+  const { data: orders = [], isLoading, isError, refetch } = useMyOrders(currentUser?.token || "");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  
+  // Review Modal State
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const handleDownloadInvoice = async (orderId: string) => {
     if (!currentUser?.token) return;
@@ -71,6 +76,11 @@ const StudentOrders = () => {
     }
   };
 
+  const handleOpenReview = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setIsReviewModalOpen(true);
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout navItems={navItems} title="My Orders">
@@ -85,7 +95,7 @@ const StudentOrders = () => {
   if (isError) {
     return (
       <DashboardLayout navItems={navItems} title="My Orders">
-        <div className="text-center py-20 px-6 max-w-sm mx-auto">
+        <div className="text-center py-20 px-6 max-sm:mx-auto">
           <AlertCircle className="w-16 h-16 mx-auto mb-4 text-destructive opacity-40" />
           <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
           <p className="text-muted-foreground mb-6">Could not load your orders. Let's try again.</p>
@@ -175,20 +185,28 @@ const StudentOrders = () => {
                   </div>
 
                   {order.status === "delivered" && (
-                    <div className="pt-2">
+                    <div className="pt-2 grid grid-cols-2 gap-3">
                       <Button 
-                        variant="secondary" 
+                        variant="outline" 
                         size="sm" 
                         onClick={() => handleDownloadInvoice(order._id)}
                         disabled={downloadingId === order._id}
-                        className="w-full font-black text-[10px] uppercase tracking-widest rounded-xl h-12 gap-2 shadow-sm"
+                        className="font-black text-[10px] uppercase tracking-widest rounded-xl h-11 gap-2 border-2 hover:bg-primary/5 transition-all"
                       >
                         {downloadingId === order._id ? (
                           <Loader2 className="w-4 h-4 animate-spin text-primary" />
                         ) : (
                           <FileDown className="w-4 h-4 text-primary" />
                         )}
-                        {downloadingId === order._id ? "Generating Invoice..." : "Download Invoice"}
+                        Invoice
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleOpenReview(order._id)}
+                        className="gradient-primary text-primary-foreground font-black text-[10px] uppercase tracking-widest rounded-xl h-11 gap-2 shadow-lg shadow-primary/20 hover:translate-y-[-1px] transition-all"
+                      >
+                        <Star className="w-4 h-4 fill-primary-foreground" />
+                        Leave Review
                       </Button>
                     </div>
                   )}
@@ -198,6 +216,21 @@ const StudentOrders = () => {
           ))
         )}
       </div>
+
+      {selectedOrderId && (
+        <ReviewModal 
+          isOpen={isReviewModalOpen}
+          onClose={() => {
+            setIsReviewModalOpen(false);
+            setSelectedOrderId(null);
+          }}
+          orderId={selectedOrderId}
+          token={currentUser?.token || ""}
+          onSuccess={() => {
+            refetch(); // Refresh orders to possibly hide/disable review in future
+          }}
+        />
+      )}
     </DashboardLayout>
   );
 };

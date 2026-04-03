@@ -13,6 +13,7 @@ import cartRoutes from "./routes/cart.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import userRoutes from "./routes/user.js";
+import reviewRoutes from "./routes/review.routes.js";
 
 // Load env vars
 dotenv.config(); 
@@ -44,6 +45,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/reviews", reviewRoutes);
 // Health check route
 app.get("/api/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is healthy" });

@@ -2,6 +2,7 @@ import Order from "../models/Order.js";
 import Menu from "../models/Menu.js";
 import ChefProfile from "../models/ChefProfile.js";
 import Address from "../models/Address.js";
+import Cart from "../models/Cart.js";
 
 /**
  * Creates a new order.
@@ -111,6 +112,9 @@ export const createOrder = async (studentId, { chefId, items, addressId, payment
     paymentStatus: paymentMethod === "online" ? "pending" : "pending", // Both start as pending, online updated later
     razorpayOrderId: razorpayOrderId || null,
   });
+
+  // 7. Clear the cart after successful order creation
+  await Cart.deleteOne({ userId: studentId });
 
   return order;
 };

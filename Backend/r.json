@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "message": "Reviews fetched",
+  "data": [
+    {
+      "_id": "69d0336153ab1b9815332773",
+      "rating": 5,
+      "comment": "It was ver tasty",
+      "image": "uploads/reviews/image-1775252321728-490725627.jpg",
+      "studentName": "Raju",
+      "createdAt": "2026-04-03T21:38:41.942Z"
+    }
+  ]
+}
