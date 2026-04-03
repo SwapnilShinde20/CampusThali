@@ -25,7 +25,7 @@ const app = express();
 /* ✅ FIRST: middleware */
 app.use(
   cors({
-    origin: ["http://localhost:8080", "https://campus-thali-kitchen.vercel.app/"],
+    origin: ["http://localhost:8080", "https://campus-thali.vercel.app"],
     credentials: true,
   })
 );
