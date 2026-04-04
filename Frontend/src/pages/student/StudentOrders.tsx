@@ -179,7 +179,6 @@ const StudentOrders = () => {
                          ) : (
                            <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0 shadow-none font-black text-[8px] px-2 py-0.5 rounded-lg tracking-widest">PAID</Badge>
                          )}
-                         <span className="text-[10px] font-bold text-muted-foreground opacity-50">₹{order.itemsTotal} + Fees</span>
                        </div>
                     </div>
                   </div>

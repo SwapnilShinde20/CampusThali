@@ -290,7 +290,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     try {
       if (paymentMethod === "online") {
         const total = cart.reduce((s, c) => s + c.menuItem.price * c.quantity, 0);
-        const billTotal = total + 20 + (total * 0.05);
+        const billTotal = total + 12; // Flat platform fee
 
         // 1. Create Razorpay Order
         const rzpRes = await api.post("/payment/create-order", { amount: billTotal }, currentUser.token);

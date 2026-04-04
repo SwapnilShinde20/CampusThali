@@ -101,17 +101,44 @@ export const generateInvoicePDF = (order) => {
   };
 
   drawSummaryLine("Items Total:", order.itemsTotal, summaryY);
-  drawSummaryLine("Delivery Fee:", order.deliveryFee, summaryY + 15);
-  drawSummaryLine("Platform Fee:", order.platformFee.toFixed(0), summaryY + 30);
+  drawSummaryLine("Platform Fee:", order.platformFee || 12, summaryY + 15);
   
-  doc.moveTo(350, summaryY + 50).lineTo(550, summaryY + 50).strokeColor("#e11d48").stroke();
+  doc.moveTo(350, summaryY + 35).lineTo(550, summaryY + 35).strokeColor("#e11d48").stroke();
   
   doc
     .fillColor("#e11d48")
     .fontSize(12)
     .font("Helvetica-Bold")
-    .text("Grand Total:", 350, summaryY + 60, { width: 100, align: "right" })
-    .text(`Rs. ${order.totalAmount}`, 480, summaryY + 60, { width: 70, align: "right" });
+    .text("Grand Total:", 350, summaryY + 45, { width: 100, align: "right" })
+    .text(`Rs. ${order.totalAmount}`, 480, summaryY + 45, { width: 70, align: "right" });
+
+  doc.fillColor("#444444");
+
+  // --- Payment Info ---
+  doc
+    .fontSize(12)
+    .font("Helvetica-Bold")
+    .text("Payment Info:", 50, summaryY);
+    
+  doc
+    .fontSize(10)
+    .font("Helvetica")
+    .text(`Method: ${order.paymentMethod?.toUpperCase() || 'COD'}`, 50, summaryY + 15)
+    .text(`Status: ${order.paymentStatus?.toUpperCase() || 'PENDING'}`, 50, summaryY + 30);
+
+  // --- Earnings Breakdown ---
+  const earningsY = summaryY + 70;
+  
+  doc
+    .fontSize(12)
+    .font("Helvetica-Bold")
+    .text("Earnings Breakdown:", 50, earningsY);
+
+  doc
+    .fontSize(10)
+    .font("Helvetica")
+    .text(`Chef Earnings: Rs. ${order.chefEarning}`, 50, earningsY + 15)
+    .text(`Platform Fee (Admin): Rs. ${order.adminEarning || 12}`, 50, earningsY + 30);
 
   // --- Footer ---
   doc

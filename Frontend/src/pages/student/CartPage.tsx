@@ -178,17 +178,13 @@ const CartPage = () => {
                   <span className="font-bold text-foreground">₹{total}</span>
                 </div>
                 <div className="flex justify-between items-center text-muted-foreground">
-                  <span>Delivery Fee</span>
-                  <span className="font-bold text-foreground">₹20</span>
-                </div>
-                <div className="flex justify-between items-center text-muted-foreground">
-                  <span>Platform Fee (5%)</span>
-                  <span className="font-bold text-foreground">₹{(total * 0.05).toFixed(0)}</span>
+                  <span>Platform Fee</span>
+                  <span className="font-bold text-foreground">₹12</span>
                 </div>
                 <div className="h-px bg-border/40 my-2" />
                 <div className="flex justify-between items-center pt-2">
-                  <span className="font-black italic uppercase tracking-tighter text-lg">TO PAY</span>
-                  <span className="text-2xl font-black text-primary tracking-tighter">₹{(total + 20 + (total * 0.05)).toFixed(0)}</span>
+                  <span className="font-black italic uppercase tracking-tighter text-lg">GRAND TOTAL</span>
+                  <span className="text-2xl font-black text-primary tracking-tighter">₹{total + 12}</span>
                 </div>
               </div>
 

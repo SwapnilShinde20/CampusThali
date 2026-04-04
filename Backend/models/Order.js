@@ -35,11 +35,6 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    deliveryFee: {
-      type: Number,
-      required: true,
-      default: 20,
-    },
     platformFee: {
       type: Number,
       required: true,
@@ -48,11 +43,11 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    commission: {
+    chefEarning: {
       type: Number,
       required: true,
     },
-    chefEarning: {
+    adminEarning: {
       type: Number,
       required: true,
     },

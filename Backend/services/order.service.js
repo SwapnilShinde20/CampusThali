@@ -73,13 +73,12 @@ export const createOrder = async (studentId, { chefId, items, addressId, payment
   }
 
   // 4. Detailed Price Breakdown
-  const deliveryFee = 20;
-  const platformFee = itemsTotal * 0.05;
-  const totalAmount = itemsTotal + deliveryFee + platformFee;
+  const platformFee = 12;
+  const totalAmount = itemsTotal + platformFee;
 
-  // 5. Chef Commissions (15% of items total only)
-  const commission = itemsTotal * 0.15;
-  const chefEarning = itemsTotal - commission;
+  // 5. Earnings
+  const chefEarning = itemsTotal; // No commission deducted
+  const adminEarning = platformFee;
 
   // 6. Save order (chefId is now the User ID)
   const order = await Order.create({
@@ -87,11 +86,10 @@ export const createOrder = async (studentId, { chefId, items, addressId, payment
     chefId,
     items: processedItems,
     itemsTotal,
-    deliveryFee,
     platformFee,
     totalAmount,
-    commission,
     chefEarning,
+    adminEarning,
     addressId: address._id,
     addressSnapshot: {
       label: address.label,
